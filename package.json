@@ -1,7 +1,7 @@
 {
   "name": "mini-webpack",
   "version": "1.0.0",
-  "description": "## 基本流程",
+  "description": "基本流程",
   "main": "index.js",
   "directories": {
     "example": "packages/example"

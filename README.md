@@ -1,5 +1,17 @@
 # Mini-Webpack
 
+## 介绍
+
+webpack 原理学习项目，实现简易 webpack 及其相关工具链，并搭配相关教程。
+
+- 实现基本打包模块 ✅
+- 实现 run-loader 模块支持 loader 运行 ✅
+- 实现基本 webpack plugin 钩子 ✅
+- 实现简易 tapable ❌
+- 实现 plugin-demo ❌
+- 实现 loder-demo ❌
+- 完整 mini-webpack 搭建教程 ❌
+
 ## 基本流程
 
 ![img.png](assets/img.png)
