@@ -132,9 +132,7 @@ class Compiler {
   }
 
   newCompilation(params) {
-    const compilation = new Compilation(this, {
-
-    })
+    const compilation = new Compilation(this, {})
     this.hooks.compilation.call(compilation, params);
     return compilation;
   }

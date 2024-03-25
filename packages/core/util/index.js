@@ -1,11 +1,6 @@
 const fs = require('fs')
 
-// utils/index.js'
-/**
- * 统一路径分隔符 主要是为了后续生成模块ID方便
- * @param {*} path
- * @returns
- */
+// 统一路径分隔符为 /
 function toUnixPath(path) {
   return path.replace(/\\/g, '/');
 }
@@ -92,8 +87,6 @@ function getSourceCode(chunk) {
   })();
   `;
 }
-
-
 
 module.exports = {
   toUnixPath,
