@@ -49,24 +49,22 @@ class Compiler {
   run(callback) {
     // 当调用run方式时 触发开始编译的plugin
     this.hooks.run.call();
-
     // 获取入口配置对象
     const entry = this.getEntry();
 
-    // 源码这里还会穿入
-    // normalModuleFactory
-    //
+    // 源码这里还会传入 normalModuleFactory 等对象
     const compilation = this.newCompilation();
 
     // 编译入口文件
     compilation.buildEntryModule(entry);
 
-    // 导出列表;之后将每个chunk转化称为单独的文件加入到输出列表assets中
+    // 导出列表之后将每个 chunk 转化称为单独的文件
+    // 加入到输出列表 assets 中
     this.emitAssets(compilation);
 
     // 结束之后触发钩子
-    // 触发结束回调
     this.hooks.done.call();
+    // 执行 compiler.run 结束后的回调并返回编译信息
     callback(null, {
       toJson: () => {
         return {
@@ -104,27 +102,24 @@ class Compiler {
     return entry;
   }
 
-  // 将chunk加入输出列表中去
+  // 将 chunk 加入输出列表中去
   emitAssets(compilation) {
     const output = this.options.output;
     // 根据 chunks 生成 assets 内容
     compilation.chunks.forEach((chunk) => {
-      // LJQFLAG assetPath
+      // MINIWEBPACKFLAG assetPath
       const parseFileName = output.filename.replace('[name]', chunk.name);
-      // assets中 { 'main.js': '生成的字符串代码...' }
       compilation.assets[parseFileName] = getSourceCode(chunk);
     });
 
-    // 调用Plugin emit钩子
+    // 调用 Plugin emit 钩子
     this.hooks.emit.call();
 
-    // 先判断目录是否存在 存在直接fs.write 不存在则首先创建
-    if (!fs.existsSync(output.path)) {
-      fs.mkdirSync(output.path);
-    }
-    // files中保存所有的生成文件名
+    // 目录不存在需要先创建目录
+    if (!fs.existsSync(output.path)) fs.mkdirSync(output.path);
+    // files 中保存所有的生成文件名
     compilation.files = Object.keys(this.assets);
-    // 将assets中的内容生成打包文件 写入文件系统中
+    // 将 assets 中的内容生成打包文件输出
     compilation.files.forEach((fileName) => {
       const filePath = path.join(output.path, fileName);
       fs.writeFileSync(filePath, this.assets[fileName]);

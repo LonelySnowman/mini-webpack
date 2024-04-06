@@ -1,61 +1,35 @@
-/******/ (() => { // webpackBootstrap
-/******/ 	var __webpack_modules__ = ({
-
-/***/ "../example/src/module.js":
-/*!********************************!*\
-  !*** ../example/src/module.js ***!
-  \********************************/
-/***/ ((module) => {
-
-// webpack/example/module.js
-const name = '19Qingfeng';
-
-module.exports = {
-  name,
-};//loader2//loader1
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-/*!********************************!*\
-  !*** ../example/src/entry1.js ***!
-  \********************************/
-// webpack/example/entry1.js
-const depModule = __webpack_require__(/*! ./module */ "../example/src/module.js");
+  var __webpack_modules__ = ({
+  "./packages/example/src/module.js":
+      ((module) => {
+  const name = 'This is module';
+  module.exports = {
+    name,
+  };
+  })
+  });
+  var __webpack_module_cache__ = {};
 
-console.log(depModule, 'dep');
-console.log('This is entry 1 !');
-//loader2//loader1
+  function __webpack_require__(moduleId) {
+    var cachedModule = __webpack_module_cache__[moduleId];
+    if (cachedModule !== undefined) {
+        return cachedModule.exports;
+    }
+    var module = __webpack_module_cache__[moduleId] = {
+        exports: {}
+    };
+    __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+    return module.exports;
+  }
+
+  var __webpack_exports__ = {};
+
+  (() => {
+    const depModule = __webpack_require__( "./packages/example/src/module.js");
+    console.log(depModule, 'Entry 1 dep');
+    console.log('This is entry 1 !');
+
+    // loader2
+    // loader1
+  })();
 })();
-
-/******/ })()
-;

@@ -1,18 +1,19 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "../example/src/module.js":
-/*!********************************!*\
-  !*** ../example/src/module.js ***!
-  \********************************/
+/***/ "./packages/example/src/module.js":
+/*!****************************************!*\
+  !*** ./packages/example/src/module.js ***!
+  \****************************************/
 /***/ ((module) => {
 
-// webpack/example/module.js
-const name = '19Qingfeng';
-
+const name = 'This is module';
 module.exports = {
   name,
-};//loader2//loader1
+};
+
+// loader2
+// loader1
 
 /***/ })
 
@@ -46,15 +47,15 @@ module.exports = {
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-/*!********************************!*\
-  !*** ../example/src/entry2.js ***!
-  \********************************/
-// webpack/example/entry2.js
-const depModule = __webpack_require__(/*! ./module */ "../example/src/module.js");
-
-console.log(depModule, 'dep');
+/*!****************************************!*\
+  !*** ./packages/example/src/entry2.js ***!
+  \****************************************/
+const depModule = __webpack_require__(/*! ./module */ "./packages/example/src/module.js");
+console.log(depModule, 'Entry 2 dep');
 console.log('This is entry 2 !');
-//loader2//loader1
+
+// loader2
+// loader1
 })();
 
 /******/ })()

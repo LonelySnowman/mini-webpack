@@ -1,6 +1,6 @@
 function loader(source) {
   console.log('loader1: normal', source);
-  return source + '//loader1';
+  return source + '\n// loader1';
 }
 
 loader.pitch = function () {

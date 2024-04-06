@@ -18,7 +18,7 @@ function tryExtensions(
   originModulePath,
   moduleContext
 ) {
-  // 用户穿入后缀优先直接寻找
+  // 用户传入后缀优先直接寻找
   extensions.unshift('');
   for (let extension of extensions) {
     if (fs.existsSync(modulePath + extension)) {
@@ -41,7 +41,9 @@ function getSourceCode(chunk) {
   const { name, entryModule, modules } = chunk;
   // 这里的 webpack modules 可以 filter 筛选一下 entry 源
   // 缩小打包体积 剔除无用代码
-  // treeShaking 如何实现？ LJQFLAG
+  // treeShaking 如何实现？ MINIWEBPACKFLAG
+  // 根据 moduleId 作为 key
+  // 处理后的代码封装成一个方法作为 value
   return `
   (() => {
     var __webpack_modules__ = {

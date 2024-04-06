@@ -1,6 +1,4 @@
-// webpack/example/module.js
-const name = '19Qingfeng';
-
+const name = 'This is module';
 module.exports = {
   name,
 };
