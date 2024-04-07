@@ -1,14 +1,14 @@
 # 【Wbpack原理】基础流程解析，实现 mini-webpack
 
-⛄：webpack 对前端同学来说并不陌生，它是我们学习前端工程化的第一站，在最开始的 ` vue-cli ` 中我们就可以发现它的身影。我们的 `vue/react` 项目是如何打包成 `js` 文件并在浏览器中运行的呢？这篇文章将会帮助你由浅入深理解 `webpack` 原理，了解其中的 `loader/plugin` 机制，熟悉 `webpack` 打包流程。实现简易 `webpack` 核心代码，`run-loader` 模块，示例 `loader` 与 `plugin`。
+⛄：webpack 对前端同学来说并不陌生，它是我们学习前端工程化的第一站，在最开始的 ` vue-cli ` 中我们就可以发现它的身影。我们的 `vue/react` 项目是如何打包成 `js` 文件并在浏览器中运行的呢？本系列文章将会帮助你由浅入深理解 `webpack` 原理，了解其中的 `loader/plugin` 机制，熟悉 `webpack` 打包流程。实现简易 `webpack` 核心代码，`run-loader` 模块，示例 `loader` 与 `plugin`。Tip：在阅读本文前需要了解一些 `webpack` 的基础概念及常用配置。
 
 本质上，**webpack** 是一个用于现代 JavaScript 应用程序的 *静态模块打包工具*。当 `webpack` 处理应用程序时，它会在内部从一个或多个入口点构建一个**依赖图(dependency graph)**，然后将你项目中所需的每一个模块组合成一个或多个 *bundles*，它们均为静态资源，用于展示你的内容。
+
+本系列全部代码与文章会在 [LonelySnowman/mini-webpack](https://github.com/LonelySnowman/mini-webpack) 同步，如果能帮到你的话请帮我点个 star 吧 😀。
 
 ## 基础流程解析
 
 webpack 打包流程可大致分为以下四部分。
-
-> compiler 对象记录着构建过程中 webpack 环境与配置信息，整个 webpack 从开始到结束的生命周期。
 
 1. 初始化准备：
    - `webpack` 会读取 `webpack.config.js` 文件中的参数，并将 `shell` 命令中的参数合并形成最终参数。
@@ -20,13 +20,38 @@ webpack 打包流程可大致分为以下四部分。
 4. 输出文件：
    - 根据模块间的依赖关系及配置文件，将处理后的模块输出到 `output` 的目录下。
 
+> compiler 对象记录着构建过程中 webpack 环境与配置信息，整个 webpack 从开始到结束的生命周期。
+
 ## 目录结构
 
-```
+首先搭建一下我们项目结构的基础目录，讲解过程中会给出具体代码，使用 pnpm-workspace 构建一个 monorepo 仓库，除 `mini-webpack`  代码外，后续还会带大家实现其他 `webpack` 相关知识模块。
+
+也可以直接去 [LonelySnowman/mini-webpack](https://github.com/LonelySnowman/mini-webpack)  克隆本系列相关代码。
+
+```js
+packages
+├─core // mini-webpack 核心代码
+│  │  compilation.js // compilation 对象实现
+│  │  compiler.js // compiler 对象实现
+│  │  index.js // 编译执行主文件
+│  │  webpack.js // webpack 初始化相关代码
+│  └─util
+│    index.js // 工具函数
+├─example // 被编译的案例代码
+│  │ webpack.config.js
+│  └─src
+│    entry1.js
+│    entry2.js
+│    module.js
+├─loaders // 简易 loader demo
+│ loader-1.js
+│ loader-2.js
+└─plugins // 简易 plugin demo
+  plugin-1.js
+  plugin-2.js
+  plugin-test.js
 
 ```
-
->  使用 pnpm-workspace 构建一个 monorepo 仓库
 
 ```yaml
 # pnpm-workspace.yaml
@@ -245,7 +270,7 @@ compilation 对象记录编译模块的信息，只要项目文件有改动，co
 
 `webpack` 插件可以简单理解为可以在 `wepack` 整个生命周期中触发的钩子，类似与 `vue` 中的 `created`，`mounted` 等生命周期。
 
-> 这里简单讲解以下，后续有单独的章节详细讲解 plugin
+> 这里简单讲解一下，后续有单独的章节详细讲解 plugin
 
 我们实现一个简易的 `webpack` 插件，`packages/plugins/plugin-test.js`，插件就是一个 `javascript` 类，需要实现 `apply` 方法供 `webpack` 调用，`webpack` 会在 `compiler` 及 `compilation` 对象上预设一系列钩子供我们调用。 
 
@@ -430,7 +455,7 @@ module.exports = {
 
 ### 从入口文件开始编译
 
-编译阶段我们需要完成以下内容：
+🤔 编译阶段我们需要完成以下内容：
 
 1. 根据入口文件构建 `compilation` 对象，`compilation` 对象会负责模块编译过程的处理。
 2. 根据入口文件路径分析入口文件，使用 `loader` 处理匹配的文件。
@@ -489,6 +514,23 @@ class Compilation {
 
 在编写模块编译的方法前，我们可以先使用原版的 `webpack` 对我们的案例进行打包，看一下打包后的结果。
 
+```js
+// packages/core/index.js
+
+// 使用 webpack 替换我们的 mini-webpack
+// const webpack = require('./webpack');
+const webpack = require('webpack');
+const config = require('../example/webpack.config');
+const compiler = webpack(config);
+compiler.run((err, stats) => {
+  if (err) {
+    console.log(err, 'err');
+  }
+});
+```
+
+然后在根目录执行 `node .\packages\core\index.js` 进行打包。
+
 我们可以看到依据我们的 `entry` 打包出了两个文件，分别来自 `entry1` 与 `entry2` ，我们可以看一下 `packages/example/build/main.js` 文件。下面的代码是剔除了注释后的。
 
 ```js
@@ -534,7 +576,7 @@ class Compilation {
 })();
 ```
 
-这样一看原理其实很简单，`webpack` 最终打包出的文件是一个立即执行函数，依次读取 `entry` 中引用的文件全部编译在 `__webpack_modules__` 中的一个对象 ，key 为模块的相对路径(作为一个模块的唯一 id)，value 为一个函数直接执行 module 中的代码。然后再封装一个  `__webpack_require__` 方法从 `__webpack_modules__` 获取 `module` 代码并执行。并将代码中的 `require` 全部替换为  `__webpack_require__`。
+🤔 这样一看原理其实很简单，`webpack` 最终打包出的文件是一个立即执行函数，依次读取 `entry` 中引用的文件全部编译在 `__webpack_modules__` 中的一个对象 ，key 为模块的相对路径(作为一个模块的唯一 id)，value 为一个函数直接执行 module 中的代码。然后再封装一个  `__webpack_require__` 方法从 `__webpack_modules__` 获取 `module` 代码并执行。并将代码中的 `require` 全部替换为  `__webpack_require__`。
 
 那么再编译模块的方法主要进行两步操作，获取代码文件的源代码字符串，然后使用 loader 对代码进行处理，再对处理后的代码进行编译，就是将代码中的 require 全部替换为 `__webpack_require__`，最后我们输出模块的时候再将 `module` 中的代码打包进 `__webpack_modules__` 就可以了。
 
@@ -588,7 +630,7 @@ handleLoader(modulePath) {
 }
 ```
 
-`loader` 处理完毕后我们需要进行 `webpack` 编译阶段，也就是需要将源代码中的 `require` 全部替换为 `__webpack_require__`，并生成 `module` 对象。这个操作可以利用 `bable` 将代码转化为 `ast` 语法树，并直接操作语法树生成新的代码，非常方便。
+🤔 `loader` 处理完毕后我们需要进行 `webpack` 编译阶段，也就是需要将源代码中的 `require` 全部替换为 `__webpack_require__`，并生成 `module` 对象。这个操作可以利用 `bable` 将代码转化为 `ast` 语法树，并直接操作语法树生成新的代码，非常方便。
 
 并且在处理过程中我们要进行递归操作，一个模块依赖其他模块时，也需要对该模块的依赖模块进行编译处理。
 
@@ -701,15 +743,13 @@ function tryExtensions(
 }
 ```
 
-
-
-到这里我们就完成了模块编译阶段，我们从打包入口开始，依次对入口文件以及引用的依赖模块进行 `loader` 处理以及 `webpack` 编译，构建出一个 **依赖图(dependency graph)**，使用 `entries` 与 `modules` 分别保存了入口对象和模块对象，我们可以根据这些信息去构建我们的 `chunks`，最后将打包后的模块输出。
+😀 到这里我们就完成了模块编译阶段，我们从打包入口开始，依次对入口文件以及引用的依赖模块进行 `loader` 处理以及 `webpack` 编译，构建出一个 **依赖图(dependency graph)**，使用 `entries` 与 `modules` 分别保存了入口对象和模块对象，我们可以根据这些信息去构建我们的 `chunks`，最后将打包后的模块输出。
 
 ## 模块生成阶段
 
 ### 组装 chunk
 
-这一阶段比较简单，一个 `entry` 生成一个 `chunk` 根据相关 `modules` 生成对象即可。
+🤔 这一阶段比较简单，一个 `entry` 生成一个 `chunk` 根据相关 `modules` 生成对象即可。
 
 ```js
 // packages/core/compilation.js
@@ -867,4 +907,20 @@ run(callback) {
 }
 ```
 
-到这里我们简易 `webpack` 的核心逻辑就实现完成了
+到这里我们简易 `webpack` 的核心逻辑就全部实现了 😀，我们可以在项目根目录下执行 `node .\packages\core\index.js` 下我们的编译命令。发现 `packages/example/build` 目录下生成了 `main.js` 与 `second.js` 两个文件，分别对应两个入口打包出的 `chunk`。
+
+## 结语
+
+想写在自己实操一遍后你已经对 `webpack` 有了更深刻的理解，之后我们还会深挖 `loader` 机制去实现 `loader-runner`，理解 `plugin` 机制并实现简易的 `tapable`，并实现简易的 `loader` 与 `pluin` ，最终能通过 `index.html` 运行我们的 web 项目。
+
+**参考文章**：
+
+[Webpack - 19组清风的专栏 - 掘金 (juejin.cn)](https://juejin.cn/column/7031912597133721631)
+
+**Github地址**：
+
+ [LonelySnowman/mini-webpack](https://github.com/LonelySnowman/mini-webpack)
+
+> 如果对你有帮助的话记得帮我点个赞 👍。
+>
+> 文章内容有不正确的地方请指出，我会及时更改 😀。

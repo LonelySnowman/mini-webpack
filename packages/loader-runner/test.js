@@ -95,7 +95,7 @@ runLoaders(
   {
     resource: filePath, // 加载的模块路径
     loaders, // 需要处理的loader数组
-    context: { name: '19Qingfeng' }, // 传递的上下文对象
+    context: { name: 'Test' }, // 传递的上下文对象
     readResource: fs.readFile.bind(fs), // 读取文件的方法
     // processResource 参数先忽略
   },
