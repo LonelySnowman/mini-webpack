@@ -1,7 +1,5 @@
 # Mini-Webpack
 
-![img_1.png](assets/webpack5.png)
-
 ## 介绍
 
 webpack 原理学习项目，实现简易 webpack 及其相关工具链，并搭配相关教程。
